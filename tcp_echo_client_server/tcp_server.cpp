@@ -19,8 +19,8 @@ int main()
 	// Bind the socket to an IP address and port
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(PORT);
-	addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = htons(PORT); // convert port to network byte order
+	addr.sin_addr.s_addr = INADDR_ANY; // listen on any inteface
 
 	if(bind(server_fd, (sockaddr*)&addr, sizeof(addr)) < 0){
 		perror("bind failed");
@@ -35,8 +35,10 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	std::cout << "Listening..." << std::endl;
-	int client_fd = accept(server_fd, (sockaddr*)&addr, (socklen_t*)&addr );
+	std::cout << "Listening on port: " << PORT << std::endl;
+	sockaddr_in client_addr{};
+	socklen_t client_len = sizeof(client_addr);
+	int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len );
 	if(client_fd < 0){
 		perror("accept failed");
 		close(server_fd);
